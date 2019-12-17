@@ -1,0 +1,97 @@
+<!DOCT
+YPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        html{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #canvas{
+            border:1px solid #000;
+            margin:0 auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const WIDTH = 500,HEIGHT = 300
+        const COLUMN_WIDTH = 15,COLUMN_MARGIN = 1
+        const LENGTH = Math.floor(WIDTH / (COLUMN_WIDTH + COLUMN_MARGIN))
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+        let sortArray = new Array()
+        let animationTime = 3
+        canvas.height = HEIGHT
+        canvas.width = WIDTH
+        init()
+        sort(ctx)
+        render(ctx)
+        function drawColumn(ctx, index, height, color){
+            ctx.fillStyle = color
+            let x = index * (COLUMN_MARGIN + COLUMN_WIDTH)
+            let y = HEIGHT
+            ctx.fillRect(x,y,COLUMN_WIDTH,-height)
+        }
+        function render(ctx, arr, currentIndex, compareIndex1, compareIndex2){
+            ctx.clearRect(0,0,WIDTH,HEIGHT)
+            for(let i = 0; i < arr.length; i++){
+                if(i == compareIndex1){
+                    drawColumn(ctx,i,arr[i],'orange')
+                }else if(i == compareIndex2){
+                    drawColumn(ctx,i,arr[i],'blue')
+                }else if(i < currentIndex){
+                    drawColumn(ctx,i,arr[i],'green')
+                }else{
+                    if(currentIndex == arr.length - 1){
+                        drawColumn(ctx,i,arr[i],'green')
+                    }else{
+                        drawColumn(ctx,i,arr[i],'black')
+                    }
+                }
+            }
+        }
+        function sort(ctx){
+            let item
+            for(let i = 0; i < LENGTH; i++){
+                for(let j = i + 1; j > 0; j--){
+                    if(sortArray[j-1] > sortArray[j]){
+                        updateView(ctx, copyArray(sortArray), i, j - 1, j)
+                        item = sortArray[j-1]
+                        sortArray[j-1] = sortArray[j]
+                        sortArray[j] = item
+                    }else{
+                        break
+                    }
+                    updateView(ctx, copyArray(sortArray), i, j - 1, j)
+                }
+                updateView(ctx, copyArray(sortArray), i, -1, -1)
+            }
+        }
+        function updateView(ctx, arr, currentIndex, compareIndex1, compareIndex2){
+            setTimeout(() => {
+                render(ctx, arr, currentIndex, compareIndex1, compareIndex2)
+            },animationTime++*20)
+        }
+        function copyArray(arr){
+            let newArr = new Array()
+            for(let i = 0; i < arr.length; i++){
+                newArr[i] = arr[i]
+            }
+            return newArr
+        }
+        function init(){
+            for(let i = 0; i < LENGTH; i++){
+                sortArray[i] = Math.floor(Math.random() * HEIGHT + 1)
+            }
+        }
+    </script>
+</body>
+</html>
